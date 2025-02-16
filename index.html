@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Expense Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            margin-bottom: 1.5rem;
+        }
+
+        form div {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4CAF50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f9;
+        }
+
+        .total {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>𝐒𝐦𝐚𝐫𝐭  𝐄𝐱𝐩𝐞𝐧𝐬𝐞  𝐓𝐫𝐚𝐜𝐤𝐞𝐫</h1>
+    </header>
+    <div class="container">
+        <form id="expense-form">
+            <div>
+                <label for="date">Date:</label>
+                <input type="date" id="date" required>
+            </div>
+            <div>
+                <label for="category">Category:</label>
+                <select id="category" required>
+                    <option value="food">Food</option>
+                    <option value="travel">Travel</option>
+                    <option value="bills">Bills</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div>
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" min="0" step="0.01" required>
+            </div>
+            <div>
+                <label for="note">Note:</label>
+                <input type="text" id="note">
+            </div>
+            <button type="button" onclick="addExpense()">Add Expense</button>
+        </form>
+
+        <h2>Expense History</h2>
+        <table id="expense-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div class="total" id="total-expenses">Total Expenses: $0.00</div>
+    </div>
+
+    <script>
+        const expenses = [];
+
+        function addExpense() {
+            const date = document.getElementById('date').value;
+            const category = document.getElementById('category').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const note = document.getElementById('note').value;
+
+            if (!date || isNaN(amount)) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            const expense = { date, category, amount, note };
+            expenses.push(expense);
+
+            updateTable();
+            updateTotal();
+        }
+
+        function updateTable() {
+            const tbody = document.querySelector('#expense-table tbody');
+            tbody.innerHTML = '';
+
+            expenses.forEach(expense => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${expense.date}</td>
+                    <td>${expense.category}</td>
+                    <td>${expense.amount.toFixed(2)}</td>
+                    <td>${expense.note}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateTotal() {
+            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            document.getElementById('total-expenses').textContent = `Total Expenses: $${total.toFixed(2)}`;
+        }
+
+        function downloadPDF() {
+            const doc = new jsPDF();
+            doc.setFontSize(16);
+            doc.text("Expense Report", 10, 10);
+
+            let y = 20;
+            doc.setFontSize(12);
+            doc.text("Date", 10, y);
+            doc.text("Category", 50, y);
+            doc.text("Amount", 100, y);
+            doc.text("Note", 140, y);
+
+            y += 10;
+            expenses.forEach(expense => {
+                doc.text(expense.date, 10, y);
+                doc.text(expense.category, 50, y);
+                doc.text(`$${expense.amount.toFixed(2)}`, 100, y);
+                doc.text(expense.note, 140, y);
+                y += 10;
+            });
+
+            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            doc.setFontSize(14);
+            doc.text(`Total Expenses: $${total.toFixed(2)}`, 10, y);
+
+            doc.save('expense_report.pdf');
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</body>
+</html>
