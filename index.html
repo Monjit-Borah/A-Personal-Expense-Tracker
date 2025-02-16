@@ -168,7 +168,7 @@
 
         function updateTotal() {
             const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-            document.getElementById('total-expenses').textContent = `Total Expenses: ₹₹{total.toFixed(2)}`;
+            document.getElementById('total-expenses').textContent = `Total Expenses: $${total.toFixed(2)}`;
         }
 
         function downloadPDF() {
